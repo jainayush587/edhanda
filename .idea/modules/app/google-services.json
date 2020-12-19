@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "140053732679",
+    "project_id": "e-dhanda-69a70",
+    "storage_bucket": "e-dhanda-69a70.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140053732679:android:c0c1fa96675b03f8888062",
+        "android_client_info": {
+          "package_name": "com.example.edhanda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140053732679-at60ai52hthe87of75teecc26n44qae9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.edhanda",
+            "certificate_hash": "cec653b6941515cc8ad1437446118fd08cee7676"
+          }
+        },
+        {
+          "client_id": "140053732679-19ktbocfn7dbc20hd3bi9hhefthrunbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBezeW3AP2p_N7-GYNi9WRgcK0jBnswwgM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140053732679-19ktbocfn7dbc20hd3bi9hhefthrunbt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
