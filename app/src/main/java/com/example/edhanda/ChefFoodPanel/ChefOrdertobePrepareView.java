@@ -35,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,7 +79,7 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
     private void CheforderdishesView() {
         RandomUID = getIntent().getStringExtra("RandomUID");
 
-        reference = FirebaseDatabase.getInstance().getReference("ChefWaitingOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("Dishes");
+        reference = FirebaseDatabase.getInstance().getReference("ChefWaitingOrders").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child(RandomUID).child("Dishes");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -107,6 +108,7 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
                                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                                         final ChefWaitingOrders chefWaitingOrders = dataSnapshot1.getValue(ChefWaitingOrders.class);
                                         HashMap<String, String> hashMap = new HashMap<>();
+                                        assert chefWaitingOrders != null;
                                         String dishid = chefWaitingOrders.getDishId();
                                         userid = chefWaitingOrders.getUserId();
                                         hashMap.put("ChefId", chefWaitingOrders.getChefId());
@@ -125,6 +127,7 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             final ChefWaitingOrders1 chefWaitingOrders1 = dataSnapshot.getValue(ChefWaitingOrders1.class);
                                             HashMap<String, String> hashMap1 = new HashMap<>();
+                                            assert chefWaitingOrders1 != null;
                                             hashMap1.put("Address", chefWaitingOrders1.getAddress());
                                             hashMap1.put("GrandTotalPrice", chefWaitingOrders1.getGrandTotalPrice());
                                             hashMap1.put("MobileNumber", chefWaitingOrders1.getMobileNumber());
@@ -213,11 +216,12 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
             }
         });
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChefWaitingOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("OtherInformation");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChefWaitingOrders").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child(RandomUID).child("OtherInformation");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ChefWaitingOrders1 chefWaitingOrders1 = dataSnapshot.getValue(ChefWaitingOrders1.class);
+                assert chefWaitingOrders1 != null;
                 grandtotal.setText("₹ " + chefWaitingOrders1.getGrandTotalPrice());
                 note.setText(chefWaitingOrders1.getNote());
                 address.setText(chefWaitingOrders1.getAddress());
@@ -238,8 +242,9 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
         NotificationSender sender = new NotificationSender(data, usertoken);
         apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {
             @Override
-            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+            public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
                 if (response.code() == 200) {
+                    assert response.body() != null;
                     if (response.body().success != 1) {
                         Toast.makeText(ChefOrdertobePrepareView.this, "Failed", Toast.LENGTH_SHORT).show();
                     }
@@ -248,7 +253,7 @@ public class ChefOrdertobePrepareView extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<MyResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<MyResponse> call, @NonNull Throwable t) {
 
             }
         });

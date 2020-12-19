@@ -23,28 +23,7 @@ public class ChooseOne extends AppCompatActivity {
         Chef = (Button) findViewById(R.id.chef);
         DeliveryPerson = (Button) findViewById(R.id.delivery);
         Customer = (Button) findViewById(R.id.customer);
-        AnimationDrawable animationDrawable = new AnimationDrawable();
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.bghome2), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic2), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic3), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic5), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic6), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.bggg), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic9), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic10), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic11), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic12), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic13), 3000);
-        animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic14), 3000);
 
-
-
-        animationDrawable.setOneShot(false);
-        animationDrawable.setEnterFadeDuration(850);
-        animationDrawable.setExitFadeDuration(1600);
-        bgimage = findViewById(R.id.back3);
-        bgimage.setBackgroundDrawable(animationDrawable);
-        animationDrawable.start();
         intent = getIntent();
         type = intent.getStringExtra("Home").toString().trim();
 

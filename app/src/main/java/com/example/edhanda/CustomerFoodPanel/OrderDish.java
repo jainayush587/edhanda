@@ -30,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class OrderDish extends AppCompatActivity {
 
@@ -50,16 +51,16 @@ public class OrderDish extends AppCompatActivity {
         setContentView(R.layout.activity_order_dish);
 
 
-        Foodname = (TextView) findViewById(R.id.food_name);
-        ChefName = (TextView) findViewById(R.id.chef_name);
-        ChefLoaction = (TextView) findViewById(R.id.chef_location);
-        FoodQuantity = (TextView) findViewById(R.id.food_quantity);
-        FoodPrice = (TextView) findViewById(R.id.food_price);
-        FoodDescription = (TextView) findViewById(R.id.food_description);
-        imageView = (ImageView) findViewById(R.id.image);
-        additem = (ElegantNumberButton) findViewById(R.id.number_btn);
+        Foodname = findViewById(R.id.food_name);
+        ChefName = findViewById(R.id.chef_name);
+        ChefLoaction = findViewById(R.id.chef_location);
+        FoodQuantity = findViewById(R.id.food_quantity);
+        FoodPrice = findViewById(R.id.food_price);
+        FoodDescription = findViewById(R.id.food_description);
+        imageView = findViewById(R.id.image);
+        additem = findViewById(R.id.number_btn);
 
-        final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String userid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         dataaa = FirebaseDatabase.getInstance().getReference("Customer").child(userid);
         dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -72,11 +73,12 @@ public class OrderDish extends AppCompatActivity {
                 RandomId = getIntent().getStringExtra("FoodMenu");
                 ChefID = getIntent().getStringExtra("ChefId");
 
-                databaseReference = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
+                databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         UpdateDishModel updateDishModel = dataSnapshot.getValue(UpdateDishModel.class);
+                        assert updateDishModel != null;
                         Foodname.setText(updateDishModel.getDishes());
                         String qua = "<b>" + "Quantity: " + "</b>" + updateDishModel.getQuantity();
                         FoodQuantity.setText(Html.fromHtml(qua));
@@ -92,6 +94,7 @@ public class OrderDish extends AppCompatActivity {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 Chef chef = dataSnapshot.getValue(Chef.class);
 
+                                assert chef != null;
                                 String name = "<b>" + "Chef Name: " + "</b>" + chef.getFname() + " " + chef.getLname();
                                 ChefName.setText(Html.fromHtml(name));
                                 String loc = "<b>" + "Location: " + "</b>" + chef.getSuburban();
@@ -103,6 +106,7 @@ public class OrderDish extends AppCompatActivity {
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         Cart cart = dataSnapshot.getValue(Cart.class);
                                         if (dataSnapshot.exists()) {
+                                            assert cart != null;
                                             additem.setNumber(cart.getDishQuantity());
                                         }
                                     }
@@ -148,12 +152,14 @@ public class OrderDish extends AppCompatActivity {
                                         }
                                     }
 
+                                    assert cart1 != null;
                                     if (ChefID.equals(cart1.getChefId())) {
-                                        data = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
+                                        data = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
                                         data.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 UpdateDishModel update = dataSnapshot.getValue(UpdateDishModel.class);
+                                                assert update != null;
                                                 dishname = update.getDishes();
                                                 dishprice = Integer.parseInt(update.getPrice());
 
@@ -179,7 +185,7 @@ public class OrderDish extends AppCompatActivity {
 
                                                 } else {
 
-                                                    firebaseDatabase.getInstance().getReference("Cart").child(custID).child(RandomId).removeValue();
+                                                    FirebaseDatabase.getInstance().getReference("Cart").child(custID).child(RandomId).removeValue();
                                                 }
                                             }
 
@@ -209,11 +215,12 @@ public class OrderDish extends AppCompatActivity {
                                         alert.show();
                                     }
                                 } else {
-                                data = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
+                                data = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(ChefID).child(RandomId);
                                 data.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         UpdateDishModel update = dataSnapshot.getValue(UpdateDishModel.class);
+                                        assert update != null;
                                         dishname = update.getDishes();
                                         dishprice = Integer.parseInt(update.getPrice());
                                         int num = Integer.parseInt(additem.getNumber());
@@ -238,7 +245,7 @@ public class OrderDish extends AppCompatActivity {
 
                                         } else {
 
-                                            firebaseDatabase.getInstance().getReference("Cart").child(custID).child(RandomId).removeValue();
+                                            FirebaseDatabase.getInstance().getReference("Cart").child(custID).child(RandomId).removeValue();
                                         }
                                     }
 

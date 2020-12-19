@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -47,41 +48,40 @@ public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_customerhome, null);
-        getActivity().setTitle("Food On");
+        requireActivity().setTitle("Home");
         setHasOptionsMenu(true);
         recyclerView = v.findViewById(R.id.recycle_menu);
         recyclerView.setHasFixedSize(true);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.move);
         recyclerView.startAnimation(animation);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
         updateDishModelList = new ArrayList<>();
-        swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipelayout);
+        swipeRefreshLayout = v.findViewById(R.id.swipelayout);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.green);
 
 
-        swipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(true);
-                String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                dataaa = FirebaseDatabase.getInstance().getReference("Customer").child(userid);
-                dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Customer cust = dataSnapshot.getValue(Customer.class);
-                        State = cust.getState();
-                        City = cust.getCity();
-                        Sub = cust.getSuburban();
-                        customermenu();
-                    }
+        swipeRefreshLayout.post(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            String userid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+            dataaa = FirebaseDatabase.getInstance().getReference("Customer").child(userid);
+            dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Customer cust = dataSnapshot.getValue(Customer.class);
+                    assert cust != null;
+                    State = cust.getState();
+                    City = cust.getCity();
+                    Sub = cust.getSuburban();
+                    customermenu();
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
-            }
+                }
+            });
         });
 
         return v;
@@ -97,7 +97,7 @@ public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout
     private void customermenu() {
 
         swipeRefreshLayout.setRefreshing(true);
-        databaseReference = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub);
+        databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -150,7 +150,7 @@ public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search, menu);
         MenuItem menuItem = menu.findItem(R.id.Searchdish);
         searchView = (SearchView) menuItem.getActionView();

@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -77,13 +78,14 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
             @Override
             public void onClick(View v) {
 
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChefPendingOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(random).child("Dishes");
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChefPendingOrders").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child(random).child("Dishes");
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             final ChefPendingOrders chefPendingOrders = snapshot.getValue(ChefPendingOrders.class);
                             HashMap<String, String> hashMap = new HashMap<>();
+                            assert chefPendingOrders != null;
                             String chefid = chefPendingOrders.getChefId();
                             String dishid = chefPendingOrders.getDishId();
                             hashMap.put("ChefId", chefPendingOrders.getChefId());
@@ -102,6 +104,7 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 ChefPendingOrders1 chefPendingOrders1 = dataSnapshot.getValue(ChefPendingOrders1.class);
                                 HashMap<String, String> hashMap1 = new HashMap<>();
+                                assert chefPendingOrders1 != null;
                                 hashMap1.put("Address", chefPendingOrders1.getAddress());
                                 hashMap1.put("GrandTotalPrice", chefPendingOrders1.getGrandTotalPrice());
                                 hashMap1.put("MobileNumber", chefPendingOrders1.getMobileNumber());
@@ -120,6 +123,7 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                     final ChefPendingOrders chefPendingOrders = snapshot.getValue(ChefPendingOrders.class);
                                                     HashMap<String, String> hashMap2 = new HashMap<>();
+                                                    assert chefPendingOrders != null;
                                                     userid = chefPendingOrders.getUserId();
                                                     dishid = chefPendingOrders.getDishId();
                                                     hashMap2.put("ChefId", chefPendingOrders.getChefId());
@@ -138,6 +142,7 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         ChefPendingOrders1 chefPendingOrders1 = dataSnapshot.getValue(ChefPendingOrders1.class);
                                                         HashMap<String, String> hashMap3 = new HashMap<>();
+                                                        assert chefPendingOrders1 != null;
                                                         hashMap3.put("Address", chefPendingOrders1.getAddress());
                                                         hashMap3.put("GrandTotalPrice", chefPendingOrders1.getGrandTotalPrice());
                                                         hashMap3.put("MobileNumber", chefPendingOrders1.getMobileNumber());
@@ -231,12 +236,13 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
             @Override
             public void onClick(View v) {
 
-                DatabaseReference Reference = FirebaseDatabase.getInstance().getReference("ChefPendingOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(random).child("Dishes");
+                DatabaseReference Reference = FirebaseDatabase.getInstance().getReference("ChefPendingOrders").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child(random).child("Dishes");
                 Reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             final ChefPendingOrders chefPendingOrders = snapshot.getValue(ChefPendingOrders.class);
+                            assert chefPendingOrders != null;
                             userid = chefPendingOrders.getUserId();
                             dishid = chefPendingOrders.getDishId();
                         }
@@ -300,8 +306,9 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
         NotificationSender sender = new NotificationSender(data, usertoken);
         apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {
             @Override
-            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+            public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
                 if (response.code() == 200) {
+                    assert response.body() != null;
                     if (response.body().success != 1) {
                         Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                     }
@@ -309,7 +316,7 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
             }
 
             @Override
-            public void onFailure(Call<MyResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<MyResponse> call, @NonNull Throwable t) {
 
             }
         });
@@ -321,7 +328,7 @@ public class ChefPendingOrdersAdapter extends RecyclerView.Adapter<ChefPendingOr
         return chefPendingOrders1list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView Address, grandtotalprice;
         Button Vieworder, Accept, Reject;

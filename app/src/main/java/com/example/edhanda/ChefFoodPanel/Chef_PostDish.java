@@ -40,6 +40,7 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Chef_PostDish extends AppCompatActivity {
@@ -47,7 +48,7 @@ public class Chef_PostDish extends AppCompatActivity {
 
     ImageButton imageButton;
     Button post_dish;
-    Spinner Dishes;
+    TextInputLayout Dishes;
     TextInputLayout desc, qty, pri;
     String description, quantity, price, dishes;
     Uri imageuri;
@@ -70,25 +71,26 @@ public class Chef_PostDish extends AppCompatActivity {
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        Dishes = (Spinner) findViewById(R.id.dishes);
+        Dishes = (TextInputLayout) findViewById(R.id.dishes);
         desc = (TextInputLayout) findViewById(R.id.description);
-        qty = (TextInputLayout) findViewById(R.id.quantity);
+        qty = (TextInputLayout) findViewById(R.id.Quantity);
         pri = (TextInputLayout) findViewById(R.id.price);
         post_dish = (Button) findViewById(R.id.post);
         FAuth = FirebaseAuth.getInstance();
-        databaseReference = firebaseDatabase.getInstance().getReference("FoodSupplyDetails");
+        databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails");
 
         try {
-            String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            dataaa = firebaseDatabase.getInstance().getReference("Chef").child(userid);
+            String userid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+            dataaa = FirebaseDatabase.getInstance().getReference("Chef").child(userid);
             dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Chef chefc = dataSnapshot.getValue(Chef.class);
+                    assert chefc != null;
                     State = chefc.getState();
                     City = chefc.getCity();
                     Sub = chefc.getSuburban();
-                    imageButton = (ImageButton) findViewById(R.id.imageupload);
+                    imageButton = (ImageButton) findViewById(R.id.image_upload);
                     imageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -101,10 +103,10 @@ public class Chef_PostDish extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
 
-                            dishes = Dishes.getSelectedItem().toString().trim();
-                            description = desc.getEditText().getText().toString().trim();
-                            quantity = qty.getEditText().getText().toString().trim();
-                            price = pri.getEditText().getText().toString().trim();
+                            dishes = Objects.requireNonNull(Dishes.getEditText()).getText().toString().trim();
+                            description = Objects.requireNonNull(desc.getEditText()).getText().toString().trim();
+                            quantity = Objects.requireNonNull(qty.getEditText()).getText().toString().trim();
+                            price = Objects.requireNonNull(pri.getEditText()).getText().toString().trim();
 
                             if (isValid()) {
                                 uploadImage();
@@ -155,7 +157,7 @@ public class Chef_PostDish extends AppCompatActivity {
         } else {
             isValidPrice = true;
         }
-        isvalid = (isValiDescription && isvalidQuantity && isValidPrice) ? true : false;
+        isvalid = isValiDescription && isvalidQuantity && isValidPrice;
 
         return isvalid;
     }
@@ -168,7 +170,7 @@ public class Chef_PostDish extends AppCompatActivity {
             progressDialog.show();
             RandomUId = UUID.randomUUID().toString();
             ref = storageReference.child(RandomUId);
-            ChefId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            ChefId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
             ref.putFile(imageuri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                 @Override
@@ -177,7 +179,7 @@ public class Chef_PostDish extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             FoodSupplyDetails info = new FoodSupplyDetails(dishes, quantity, price, description, String.valueOf(uri), RandomUId, ChefId);
-                            firebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUId)
+                            FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUId)
                                     .setValue(info).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -236,7 +238,7 @@ public class Chef_PostDish extends AppCompatActivity {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                ((ImageButton) findViewById(R.id.imageupload)).setImageURI(result.getUri());
+                ((ImageButton) findViewById(R.id.image_upload)).setImageURI(result.getUri());
                 Toast.makeText(this, "Cropped Successfully", Toast.LENGTH_SHORT).show();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "Cropping failed" + result.getError(), Toast.LENGTH_SHORT).show();

@@ -42,6 +42,7 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Update_Delete_Dish extends AppCompatActivity {
@@ -81,12 +82,13 @@ public class Update_Delete_Dish extends AppCompatActivity {
         Delete_dish = (Button) findViewById(R.id.Deletedish);
         ID = getIntent().getStringExtra("updatedeletedish");
 
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        dataaa = firebaseDatabase.getInstance().getReference("Chef").child(userid);
+        String userid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        dataaa = FirebaseDatabase.getInstance().getReference("Chef").child(userid);
         dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Chef chefc = dataSnapshot.getValue(Chef.class);
+                assert chefc != null;
                 State = chefc.getState();
                 City = chefc.getCity();
                 Sub = chefc.getSuburban();
@@ -94,9 +96,9 @@ public class Update_Delete_Dish extends AppCompatActivity {
                 Update_dish.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        description = desc.getEditText().getText().toString().trim();
-                        quantity = qty.getEditText().getText().toString().trim();
-                        price = pri.getEditText().getText().toString().trim();
+                        description = Objects.requireNonNull(desc.getEditText()).getText().toString().trim();
+                        quantity = Objects.requireNonNull(qty.getEditText()).getText().toString().trim();
+                        price = Objects.requireNonNull(pri.getEditText()).getText().toString().trim();
 
 
                         if (isValid()) {
@@ -120,7 +122,7 @@ public class Update_Delete_Dish extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                firebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(ID).removeValue();
+                                FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(ID).removeValue();
 
                                 AlertDialog.Builder food = new AlertDialog.Builder(Update_Delete_Dish.this);
                                 food.setMessage("Your Dish has been Deleted");
@@ -151,17 +153,18 @@ public class Update_Delete_Dish extends AppCompatActivity {
 
                 String useridd = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 progressDialog = new ProgressDialog(Update_Delete_Dish.this);
-                databaseReference = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(useridd).child(ID);
+                databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(useridd).child(ID);
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         UpdateDishModel updateDishModel = dataSnapshot.getValue(UpdateDishModel.class);
 
-                        desc.getEditText().setText(updateDishModel.getDescription());
-                        qty.getEditText().setText(updateDishModel.getQuantity());
+                        assert updateDishModel != null;
+                        Objects.requireNonNull(desc.getEditText()).setText(updateDishModel.getDescription());
+                        Objects.requireNonNull(qty.getEditText()).setText(updateDishModel.getQuantity());
                         Dishname.setText("Dish name: " + updateDishModel.getDishes());
                         dishes = updateDishModel.getDishes();
-                        pri.getEditText().setText(updateDishModel.getPrice());
+                        Objects.requireNonNull(pri.getEditText()).setText(updateDishModel.getPrice());
                         Glide.with(Update_Delete_Dish.this).load(updateDishModel.getImageURL()).into(imageButton);
                         dburi = updateDishModel.getImageURL();
 
@@ -175,7 +178,7 @@ public class Update_Delete_Dish extends AppCompatActivity {
 
 
                 FAuth = FirebaseAuth.getInstance();
-                databaseReference = firebaseDatabase.getInstance().getReference("FoodSupplyDetails");
+                databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails");
                 storage = FirebaseStorage.getInstance();
                 storageReference = storage.getReference();
                 imageButton.setOnClickListener(new View.OnClickListener() {
@@ -202,7 +205,7 @@ public class Update_Delete_Dish extends AppCompatActivity {
         pri.setErrorEnabled(false);
         pri.setError("");
 
-        boolean isValiDescription = false, isValidPrice = false, isvalidQuantity = false, isvalid = false;
+        boolean isValiDescription = false, isValidPrice = false, isvalidQuantity = false, isvalid;
         if (TextUtils.isEmpty(description)) {
             desc.setErrorEnabled(true);
             desc.setError("Description is Required");
@@ -224,7 +227,7 @@ public class Update_Delete_Dish extends AppCompatActivity {
         } else {
             isValidPrice = true;
         }
-        isvalid = (isValiDescription && isvalidQuantity && isValidPrice) ? true : false;
+        isvalid = isValiDescription && isvalidQuantity && isValidPrice;
 
         return isvalid;
     }
@@ -257,7 +260,7 @@ public class Update_Delete_Dish extends AppCompatActivity {
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
 
                     double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                     progressDialog.setMessage("Uploaded " + (int) progress + "%");
@@ -268,9 +271,9 @@ public class Update_Delete_Dish extends AppCompatActivity {
     }
 
     private void updatedesc(String uri) {
-        ChefId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        ChefId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         FoodSupplyDetails info = new FoodSupplyDetails(dishes, quantity, price, description, uri, ID, ChefId);
-        firebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub)
+        FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(ID)
                 .setValue(info).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

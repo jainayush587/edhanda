@@ -55,7 +55,7 @@ public class ChefOrderTobePreparedAdapter extends RecyclerView.Adapter<ChefOrder
         return chefWaitingOrders1list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView Address, grandtotalprice;
         Button Vieworder;

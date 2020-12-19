@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class ChefHomeFragment extends Fragment {
@@ -44,18 +45,19 @@ public class ChefHomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_chef_home, null);
-        getActivity().setTitle("Food On");
+        requireActivity().setTitle("Home");
         setHasOptionsMenu(true);
         recyclerView = v.findViewById(R.id.Recycle_menu);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         updateDishModelList = new ArrayList<>();
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         dataaa = FirebaseDatabase.getInstance().getReference("Chef").child(userid);
         dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Chef chefc = dataSnapshot.getValue(Chef.class);
+                assert chefc != null;
                 State = chefc.getState();
                 City = chefc.getCity();
                 Sub = chefc.getSuburban();
@@ -75,8 +77,8 @@ public class ChefHomeFragment extends Fragment {
 
     private void chefDishes() {
 
-        String useridd = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("FoodSupplyDetails").child(State).child(City).child(Sub).child(useridd);
+        String useridd = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails").child(State).child(City).child(Sub).child(useridd);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -100,7 +102,7 @@ public class ChefHomeFragment extends Fragment {
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.logout, menu);
     }
 
